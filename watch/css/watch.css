@@ -1,0 +1,238 @@
+	body {
+		margin: 0;
+		background: url("https://img.alicdn.com/tps/TB1fOT2MpXXXXbQXpXXXXXXXXXX-1920-1080.png");
+	}
+	
+	#title {
+		width: 100%;
+		position: absolute;
+		top: 2%;
+		text-align: center;
+		color: rgba(255, 255, 255, 1);
+		font-size: 65px;
+	}
+	
+	#title strong {
+		font-weight: 500;
+	}
+	
+	#main,
+	#backgroun {
+		position: absolute;
+		width: 96%;
+		height: 100%;
+		left: 2%;
+		top: 0;
+	}
+	
+	.BMap_cpyCtrl {
+		display: none;
+	}
+	
+	.anchorBL {
+		display: none;
+	}
+	
+	#main {
+		z-index: 1;
+	}
+	/*vue数据渲染*/
+	
+	#content {
+		height: 100%;
+		width: 100%;
+	}
+	/*时钟*/
+	
+	.timeDate {
+		position: absolute;
+		top: 2%;
+		margin-top: 86px;
+		width: 100%;
+		text-align: center;
+	}
+	
+	.timeDate span {
+		font-size: 16px;
+		margin: 0 5px;
+		color: rgba(255, 255, 255, 0.8);
+	}
+	
+	.timeDate .time {
+		line-height: 20px;
+		vertical-align: top;
+	}
+	
+	.glyphicon-time {
+		display: inline-block;
+	}
+	/*互联网数据数据实时监控*/
+	
+	.countData {
+		position: absolute;
+		top: 2%;
+		margin-top: 110px;
+		width: 100%;
+		text-align: center;
+	}
+	
+	.countData span {
+		line-height: 50px;
+		font-size: 38px;
+		margin: 0 5px;
+		color: #FF9900;
+	}
+	
+	.countData .date {
+		color: #fff;
+		display: inline-block;
+		height: 50px;
+		font-size: 38px;
+		line-height: 50px;
+		width: 200px;
+		background-color: rgba(224, 222, 222, 0.3);
+	}
+	/*实时数据*/
+	
+	.realDataTitle,
+	.companyDataTitle,
+	.companySourceTitle,
+	.scaleDataTitle {
+		position: absolute;
+		color: rgba(255, 255, 255, 1);
+		font-size: 28px;
+		font-weight: 500;
+	}
+	
+	.realDataTitle {
+		left: 14%;
+		top: 14%;
+	}
+	
+	.topTitle {
+		position: absolute;
+		background-color: rgba(0, 12, 23, 0.2);
+		left: 6%;
+		top: 19%;
+		width: 23%;
+		height: 5%;
+		overflow: hidden;
+		color: #44D3E4;
+	}
+	
+	.topTitle .span1 {
+		width: 60%;
+		text-align: center;
+		line-height: 50px;
+		display: inline-block;
+	}
+	
+	.topTitle .span2 {
+		width: 35%;
+		text-align: center;
+		line-height: 50px;
+		display: inline-block;
+	}
+	
+	.realData {
+		z-index: 10;
+		position: absolute;
+		background-color: rgba(0, 12, 23, 0.2);
+		left: 6%;
+		top: 24%;
+		width: 23%;
+		height: 32%;
+		overflow: hidden;
+	}
+	
+	.scroll-content {
+		padding: 0;
+		position: relative;
+		transition: top 0.5s;
+	}
+	
+	.realData li {
+		color: #44D3E4;
+		list-style: none;
+		height: 20%;
+		overflow: hidden;
+	}
+	
+	.realData li .sourceSite,
+	.realData li .title {
+		height: 100%;
+		line-height: 300%;
+		display: inline-block;
+		word-break: keep-all;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+	
+	.realData li .sourceSite {
+		width: 25%;
+		font-size: 14px;
+		color: rgba(68, 211, 228, 0.6);
+	}
+	
+	.realData li .title {
+		width: 60%;
+		margin: 0 5%;
+		color: rgb(68, 211, 228);
+		text-decoration: none;
+	}
+	
+	.sliderbox {
+		position: relative;
+	}
+	/*辖区企业及数据*/
+	
+	.companyDataTitle {
+		right: 16%;
+		top: 59%;
+	}
+	
+	#companyData {
+		z-index: 2;
+		position: absolute;
+		background-color: rgba(0, 12, 23, 0);
+		right: 4%;
+		top: 61%;
+		width: 35%;
+		height: 38%;
+	}
+	/*数据主要来源*/
+	
+	.companySourceTitle {
+		left: 15%;
+		top: 59%;
+	}
+	
+	#companySource {
+		position: absolute;
+		background-color: rgba(0, 47, 71, 0);
+		color: rgba(255, 255, 255, 1);
+		left: 6%;
+		top: 63%;
+		width: 26%;
+		height: 37%;
+	}
+	/*辖区数据主要占比*/
+	
+	#scaleData {
+		z-index: 2;
+		position: absolute;
+		right: 2%;
+		top: 19%;
+		width: 40%;
+		height: 40%;
+	}
+	
+	.scaleDataTitle {
+		right: 17%;
+		top: 14%;
+	}
+	[v-cloak] {
+		display: none !important;
+	}
+	

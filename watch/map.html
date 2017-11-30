@@ -1,0 +1,773 @@
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="css/watch.css" />
+	</head>
+	<!--<script src="http://lab.mkblog.cn/high/happy.js"></script>-->
+	<body>
+		<!--上层Json地图-->
+		<div id="main"></div>
+		<!--底层百度地图-->
+		<div id="backgroun"></div>
+		<!--vue数据模板-->
+		<div id="content" v-cloak>
+			<!--标题-->
+			<div id="title">
+				<strong>碑林地税互联网监控平台</strong>
+			</div>
+			<!--时钟-->
+			<div class="timeDate">
+				<span class="glyphicon-time">
+					<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1511409160323" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5500" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20"><defs><style type="text/css"></style></defs><path d="M514.881117 0C801.54988 9.541662 1026.174568 222.576721 1023.986968 517.344262 1021.845912 802.895953 803.178944 1021.516375 507.387421 1023.983244c-140.983875 1.117073-264.792758-54.038388-364.165677-157.414151C45.664067 765.055117-2.50969 641.990949 0.096813 503.567033c2.559958-137.353389 54.131478-258.136867 154.295657-355.880722C254.091202 50.454447 375.433217 6.097355 514.881117 0z m-2.141056 59.018671c-254.180568 3.397763-452.135147 201.817788-454.090024 449.435554-2.047966 256.647437 201.445431 455.998356 450.738806 457.255063 256.321624 1.303251 456.044901-201.445431 456.789616-451.297342 0.69817-253.761666-201.166163-451.902423-453.438398-455.393275z" fill="#53F3F3" p-id="5501"></path><path d="M483.27727 383.295546V236.074682c0-5.678453 0.046545-11.449994 0.930894-17.035357 2.234145-14.568489 12.334344-22.993078 27.135556-23.272347 15.918285-0.279268 26.437386 7.586785 29.043888 22.527632 1.117073 6.423168 1.070528 13.079059 1.070528 19.64186l0.046545 256.321624c0 20.712388 0 20.758933 21.364014 20.758933 72.423542 0 144.80054-0.046545 217.270626 0.046545 22.574176 0.046545 34.396528 11.729263 33.651813 32.441651a24.575598 24.575598 0 0 1-21.22438 24.389419c-6.888615 1.070528-13.963408 1.442885-20.945111 1.442885-82.523741 0.093089-165.094026 0.046545-247.617767 0.046545-3.490852 0-7.028249-0.046545-10.5191-0.325813-20.200397-1.535975-29.462791-10.472556-29.928238-30.812587-0.651626-28.904254-0.279268-57.808509-0.279268-86.759307V383.295546z" fill="#53F3F3" p-id="5502"></path></svg>
+				</span>
+				<span class="time">{{timeDate}}</span>
+			</div>
+			<!--互联网数据数据实时监控-->
+			<div class="countData">
+				<span>互联网数据</span>
+				<span class="date">{{countData}}</span>
+			</div>
+			<!--实时数据-->
+			<strong class="realDataTitle">实时数据</strong>
+			<div class="topTitle" v-if="isShow">
+				<span class="span1">标题</span>
+				<span class="span2">来源</span>
+			</div>
+			<div class="realData" id="text" v-if="isShow">
+				<ul class="scroll-content">
+					<li v-for="(data,key) in realData">
+						<a :title="data.title" :href='data.sourceUrl' class="title" target="_blank">{{data.title}}</a>
+						<span class="sourceSite">{{data.sourceSite}}</span>
+						<!--<span class="com">{{data.company}}</span>-->
+					</li>
+				</ul>
+			</div>
+			<!--辖区企业及数据-->
+			<strong class="companyDataTitle">辖区企业及数据</strong>
+			<div id="companyData">
+			</div>
+			<!--数据主要来源-->
+			<strong class="companySourceTitle">数据主要来源</strong>
+			<div id="companySource">
+			</div>
+			<!--辖区数据占比-->
+			<strong class="scaleDataTitle">辖区数据占比</strong>
+			<div id="scaleData">
+			</div>
+		</div>
+
+		<script src="js/vue.min.js"></script>
+		<script src="js/vue-resource.min.js"></script>
+		<script src="js/echarts.min.js"></script>
+		<script src="js/china.js"></script>
+		<script src="js/bmap.js"></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=MC5g3mUq4glPEZWbBzaAT65QSi68UtS0"></script>
+		<script src="js/jquery-3.2.1.min.js"></script>
+		<script src="js/watch.js"></script>
+		<script>
+			var that
+			var mapUrl = 'http://192.168.1.160:8080'
+			var myChart = echarts.init(document.getElementById('main'));
+			var Inter = []
+			var Inter2 = []
+			var vm = new Vue({
+				el: '#content',
+				data: {
+					isShow: false,
+					timeDate: '0000-00-00 00:00:00', //实时时间
+					realData: [],
+					time: 0,
+					lastTime: 0,
+					activeIndex: 0,
+					companyCount: [],
+					moveLines: [],
+					citys: [{
+						"name": "西安",
+						"value": [108.93, 34.27],
+						"symbolSize": 10, //点的大小
+						"itemStyle": {
+							"normal": {
+								"color": "#F58158" //每个点的颜色
+							}
+						}
+					}],
+					symbolSize: [],
+					areaName: [],
+					dataCount: [],
+					countData: 0,
+					sourceData: [],
+					sourceName: [],
+					sourceMax: [],
+					scaleData: []
+				},
+				computed: {
+					top: function() {
+						return -this.activeIndex * 50 + 'px';
+					}
+				},
+				mounted: function() {
+					that = this
+					myChart.showLoading(
+						'default', {
+							text: '加载中，请稍后...',
+							color: '#c23531',
+							textColor: '#fff',
+							maskColor: 'rgba(5,14,39,0.9)',
+							zlevel: 1
+						})
+					/*互联网数据条数*/
+					this.getCount()
+					/*背景迁徙图*/
+					this.getBackImage()
+					/*顶部时间*/
+					this.getTime()
+					/*获取实时数据*/
+					this.getCurrentData()
+					/*延时三秒关闭*/
+					setTimeout(function() {
+						/*辖区数据占比*/
+						that.getScaleData()
+						/*辖区企业及数据*/
+						that.getComsAndData()
+						/*数据主要来源*/
+						that.getSourceData()
+						myChart.hideLoading()
+						that.isShow = true
+					}, 2000)
+
+				},
+				methods: {
+					/*互联网数据*/
+					getCount: function() {
+						that.getAjaxCount()
+						clearInterval(timer)
+						var timer = setInterval(function() {
+							that.getAjaxCount()
+						}, 1000)
+					},
+					/*互联网数据Ajax请求*/
+					getAjaxCount: function() {
+						that.$http.get(mapUrl + '/watch/getDataCount').then(function(response) {
+							if(response.data.code == 100) {
+								that.countData = response.data.dataCount
+							}
+						}, function(response) {
+							console.log('请求错误！')
+						})
+					},
+					/*背景迁徙图*/
+					getBackImage: function() {
+						that.getMapdata()
+						/*实时请求迁徙图数据*/
+						clearInterval(timer)
+						var timer = setInterval(function() {
+							that.getMapdata()
+						}, 2000)
+					},
+					/*迁徙图ajax数据请求*/
+					getMapdata: function() {
+						that.$http.get(mapUrl + '/watch/getCurrentChartData?lastTime=' + that.time).then(function(response) {
+							if(response.data.code == 100) {
+								that.time = response.data.lastTime
+								for(var i = 0; i < Inter.length; i++) {
+									clearInterval(Inter[i]);
+								}
+								Inter = []
+								var i = 0
+								var j = 1
+
+								function containsLines(arr, obj) {
+									var i = arr.length;
+									while(i--) {
+										if(arr[i].fromName === obj) {
+											return true;
+										}
+									}
+									return false;
+								}
+
+								function containsCitys(arr, obj) {
+									var i = arr.length;
+									while(i--) {
+										if(arr[i].name === obj) {
+											return i;
+										}
+									}
+									return -2;
+								}
+								mapTimer = setInterval(function() {
+									if(response.data.data.moveLines && i < response.data.data.moveLines.length) {
+										var isLine = containsLines(that.moveLines, response.data.data.moveLines[i].fromName)
+										if(!isLine) {
+											that.moveLines.push(response.data.data.moveLines[i])
+										}
+										if(that.moveLines.length > 15) {
+											that.moveLines.shift()
+										}
+										i += 1
+									}
+									if(response.data.data.citys && j < response.data.data.citys.length) {
+										var isCity = containsCitys(that.citys, response.data.data.citys[j].name)
+										if(isCity == -2) {
+											that.citys.push(response.data.data.citys[j])
+											that.citys[j].symbolSize = response.data.data.citys[j].dataCount * 2
+											if(that.citys[j].symbolSize > 8) {
+												that.citys[j].symbolSize = 8
+											}
+										} else {
+											that.citys[isCity].symbolSize = that.citys[isCity].symbolSize + response.data.data.citys[j].dataCount * 2
+											if(that.citys[isCity].symbolSize > 8) {
+												that.citys[isCity].symbolSize = 8
+											}
+										}
+										if(that.citys.length && that.citys.length > 16) {
+											that.citys.splice(1, 1)
+										}
+										j += 1
+									}
+									myChart.setOption({
+										backgroundColor: 'rgba(255,255,255,0)',
+										title: {
+											left: 'center',
+											padding: [25, 0, 0, 0],
+											textStyle: {
+												color: '#fff',
+												fontSize: 60,
+												fontWeight: 200
+											}
+										},
+										tooltip: {
+											trigger: 'item'
+										},
+										geo: {
+											map: 'china',
+											zoom: 1.49,
+											center: [113.95, 33.16],
+											aspectScale: 0.83,
+											label: {
+												normal: {
+													show: true,
+													color: 'rgba(255,255,255,0.3)'
+												},
+												emphasis: {
+													show: false,
+												}
+											},
+											itemStyle: {
+												normal: {
+													borderColor: 'red',
+													opacity: 0
+												},
+												emphasis: {
+													opacity: 0
+												}
+											}
+										},
+										series: [{
+												type: 'lines',
+												zlevel: 1,
+												effect: {
+													show: true,
+													constantSpeed: 150,
+													symbol: 'circle',
+													color: '#3BC1D1',
+													trailLength: 0.01,
+													symbolSize: [1, 30],
+												},
+												lineStyle: {
+													normal: {
+														color: '#00182E',
+														width: 1,
+														opacity: 0.3,
+														curveness: 0.2
+													}
+												},
+												data: that.moveLines
+											},
+											{
+												type: 'effectScatter',
+												coordinateSystem: 'geo',
+												zlevel: 2,
+												effectType: 'ripple',
+												symbolSize: 4,
+												hoverAnimation: true,
+												rippleEffect: {
+													period: 1,
+													scale: 6,
+													brushType: 'fill'
+												},
+												label: {
+													normal: {
+														show: true,
+														position: 'right',
+														color: '#5DE3E1',
+														formatter: '{b}'
+													}
+												},
+												itemStyle: {
+													normal: {
+														color: 'rgba(88,211,211,0.9)'
+													}
+												},
+												data: that.citys
+											}
+										]
+									});
+								}, 500)
+								Inter.push(mapTimer);
+							}
+						}, function(response) {
+							console.log('请求错误！')
+						})
+					},
+					/*顶部时间*/
+					getTime: function() {
+						clearInterval(timer);
+						var timer = setInterval(function() {
+							var date = new Date();
+							var seperator1 = "-";
+							var seperator2 = ":";
+							var month = date.getMonth() + 1;
+							var strDate = date.getDate();
+							var hours = date.getHours()
+							var minutes = date.getMinutes()
+							var seconds = date.getSeconds()
+							if(hours >= 1 && hours <= 9) {
+								hours = "0" + hours
+							}
+							if(minutes >= 1 && minutes <= 9) {
+								minutes = "0" + minutes
+							}
+							if(seconds >= 1 && seconds <= 9) {
+								seconds = "0" + seconds
+							}
+							if(month >= 1 && month <= 9) {
+								month = "0" + month;
+							}
+							if(strDate >= 0 && strDate <= 9) {
+								strDate = "0" + strDate;
+							}
+							that.timeDate = date.getFullYear() + seperator1 + month + seperator1 + strDate +
+								" " + hours + seperator2 + minutes +
+								seperator2 + seconds;
+						}, 1000)
+
+					},
+					/*获取实时数据*/
+					getCurrentData: function() {
+						that.getAjaxCurrent()
+						clearInterval(timer)
+						var timer = setInterval(function() {
+							that.getAjaxCurrent()
+						}, 2000)
+					},
+					/*实时数据ajax*/
+					getAjaxCurrent: function() {
+						that.$http.get(mapUrl + '/watch/getCurrentData?lastTime=' + that.lastTime).then(function(response) {
+							if(response.data.code == 100) {
+								that.lastTime = response.data.lastTime
+								for(var i = 0; i < Inter2.length; i++) {
+									clearInterval(Inter2[i]);
+								}
+								Inter2 = []
+								that.realData = that.realData.concat(response.data.data)
+								for(var j = 0; j < that.realData.length; j++) {
+									if(j > 20) {
+										var k = j - 20
+										that.realData.splice(0, k)
+									}
+								}
+								var oDiv = $('#text')
+								var realTimer = setInterval(function() {
+									var oLi = oDiv.find("ul:first");
+									var lineHeight = oLi.find("li:first").height();
+									oLi.animate({
+											"margin-top": -lineHeight + "px"
+										},
+										1000,
+										function() {
+											oLi.css({
+												"margin-top": "0px"
+											}).find("li:first").appendTo(oLi);
+										})
+								}, 1500);
+								Inter2.push(realTimer)
+							}
+						}, function(response) {
+							console.log('请求错误！')
+						})
+					},
+					/*辖区企业及数据*/
+					getComsAndData: function() {
+						that.getAjaxComAndData()
+						clearInterval(timer)
+						var timer = setInterval(function() {
+							that.getAjaxComAndData()
+						}, 2000)
+					},
+					/*辖区企业及数据Ajax请求*/
+					getAjaxComAndData: function() {
+						var myBar = echarts.init(document.getElementById('companyData'));
+						that.$http.get(mapUrl + '/watch/getComsAndData').then(function(response) {
+							for(var i = 0; i < response.data.data.length; i++) {
+								that.companyCount[i] = response.data.data[i].companyCount
+								that.areaName[i] = response.data.data[i].areaName.substring(0,response.data.data[i].areaName.length - 2)
+								that.dataCount[i] = response.data.data[i].dataCount
+							}
+							myBar.setOption({
+								tooltip: {
+									trigger: 'axis',
+									axisPointer: { // 坐标轴指示器，坐标轴触发有效
+										type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+									}
+								},
+								legend: {
+									top: '10%',
+									textStyle: {
+										color: '#fff',
+									},
+									data: ['辖区数据', '辖区企业']
+								},
+								grid: {
+									left: '5%',
+									right: '5%',
+									bottom: '1%',
+									containLabel: true
+								},
+								yAxis: {
+									type: 'value',
+									axisLine: {
+										show: true,
+										lineStyle: {
+											color: 'rgba(255,255,255,0.1)',
+										}
+									},
+									axisLabel: {
+										color: '#fff'
+									},
+									splitLine: {
+										lineStyle: {
+											opacity: 0.1
+										}
+									},
+								},
+								xAxis: {
+									type: 'category',
+									axisTick: {
+										show: false
+									},
+									axisLine: {
+										show: true,
+										lineStyle: {
+											color: 'rgba(255,255,255,0.1)',
+										}
+									},
+									axisLabel: {
+										interval: 0,
+										fontSize: 12,
+										rotate: 0,
+										color: '#fff'
+									},
+									data: that.areaName
+								},
+								series: [{
+										name: '辖区数据',
+										type: 'bar',
+										itemStyle: {
+											normal: {
+												show: true,
+												color: '#277ace',
+												barBorderRadius: 8,
+												borderWidth: 0,
+												borderColor: '#333',
+											}
+										},
+										barGap: '0%',
+										barCategoryGap: '60%',
+										data: that.dataCount
+									}, {
+										name: '辖区企业',
+										type: 'bar',
+										itemStyle: {
+											normal: {
+												show: true,
+												color: '#5de3e1',
+												barBorderRadius: 8,
+												borderWidth: 0,
+												borderColor: '#333',
+											}
+										},
+										barGap: '0%',
+										barCategoryGap: '60%',
+										data: that.companyCount
+									}
+
+								]
+							});
+						}, function(response) {
+							console.log('请求错误！')
+						})
+					},
+					/*数据主要来源*/
+					getSourceData: function() {
+						that.getAjaxSource()
+						clearInterval(timer)
+						var timer = setInterval(function() {
+							that.getAjaxSource()
+						}, 2000)
+					},
+					/*数据来源Ajax请求*/
+					getAjaxSource: function() {
+						var myBarSource = echarts.init(document.getElementById('companySource'));
+						that.$http.get(mapUrl + '/watch/getHotWebSite').then(function(response) {
+							if(response.data.code == 100) {
+								for(var i = 0; i < response.data.data.length; i++) {
+									that.sourceData[i] = response.data.data[i].dataCount
+									that.sourceName[i] = 'No.' + (-i + 6) + '   ' + response.data.data[i].siteName
+									that.sourceMax[i] = response.data.data[i].max
+								}
+								myBarSource.setOption({
+									grid: {
+										left: 20,
+										right: 40,
+										top: 20,
+										bottom: 0,
+									},
+									xAxis: {
+										type: 'value',
+										show: true,
+										max: that.sourceMax[0],
+										axisLine: {
+											show: false
+										},
+										axisTick: {
+											show: false
+										},
+										axisLabel: {
+											show: false
+										},
+										splitLine: {
+											show: false
+										}
+									},
+									yAxis: [{
+										position: "left",
+										data: that.sourceName,
+										axisLine: {
+											show: false,
+											lineStyle: {
+												color: '#fff'
+											}
+										},
+										axisTick: {
+											show: false
+										},
+										splitLine: {
+											show: false
+										},
+										axisLabel: {
+											show: true,
+											align: 'left',
+											padding: [-20, 0, 20, 10],
+
+										},
+									}, {
+										type: 'category',
+										position: "right",
+										data: that.sourceData,
+										axisLine: {
+											show: false,
+											lineStyle: {
+												color: '#fff'
+											}
+										},
+										axisTick: {
+											show: false
+										},
+										axisLabel: {
+											show: false,
+										},
+										splitLine: {
+											show: false
+										}
+									}],
+									series: [{
+											name: '外框',
+											type: 'bar',
+											yAxisIndex: 0,
+											barWidth: 5,
+											label: {
+												normal: {
+													show: true,
+													color: '#fff',
+													formatter: function(data) {
+														return that.sourceData[data.dataIndex];
+													},
+													position: 'right',
+												}
+											},
+											itemStyle: {
+												normal: {
+													color: 'rgba(68,211,228,0.3)',
+													barBorderRadius: 10,
+												}
+											},
+											data: that.sourceMax
+										},
+										{
+											name: '内条',
+											type: 'bar',
+											yAxisIndex: 1,
+											data: that.sourceData,
+											barWidth: 5,
+											barGap: '300%',
+											itemStyle: {
+												normal: {
+													barBorderRadius: 10,
+													color: {
+														type: 'linear',
+														x: 0,
+														y: 0,
+														x2: 1,
+														y2: 0,
+														colorStops: [{
+															offset: 0,
+															color: '#00ffa8' // 0% 处的颜色
+														}, {
+															offset: 1,
+															color: '#ffea00' // 100% 处的颜色
+														}],
+														globalCoord: false // 缺省为 false
+													},
+												}
+											},
+											label: {
+												normal: {
+													show: true,
+													position: 'insideRight',
+													formatter: '   ',
+													backgroundColor: '#fff',
+													distance: 0,
+													borderColor: 'rgba(255, 234, 0, 0.5)',
+													borderWidth: 8,
+													borderRadius: 10,
+													color: '#fff'
+												}
+											}
+
+										}
+									]
+								});
+							}
+						}, function(response) {
+							console.log('请求错误！')
+						})
+					},
+					/*辖区数据占比*/
+					getScaleData: function() {
+						that.getAjaxScale()
+						clearInterval(timer)
+						var timer = setInterval(function() {
+							that.getAjaxScale()
+						}, 2000)
+					},
+					/*辖区数据占比Ajax*/
+					getAjaxScale: function() {
+						var myPie = echarts.init(document.getElementById('scaleData'));
+						that.$http.get(mapUrl + '/watch/getComsAndData').then(function(response) {
+							if(response.data.code == 100) {
+								that.scaleData = []
+								for(var i = 0; i < response.data.data.length; i++) {
+									/*数组里面添加对象*/
+									var obj = {}
+									obj.name = response.data.data[i].areaName
+									obj.value = response.data.data[i].companyCount
+									that.scaleData.push(obj)
+								}
+								myPie.setOption({
+									color: ['#58D3D3', '#C47C0B', '#1E90FF', '#fff', '#EEC900', '#E9967A', '#FF00FF', '#7D26CD'],
+									series: [{
+											name: '访问量',
+											type: 'pie',
+											roseType: 'area',
+											radius: ['40%', '50%'],
+											center: ['50%', '50%'],
+											label: {
+												normal: {
+													formatter: '{b|{b}}\n{per|{d}%}',
+													shadowColor: '#00FFFF',
+													padding: [2, 4],
+													rich: {
+														b: {
+															color: '#fff',
+															fontSize: 14,
+															lineHeight: 26
+														},
+														per: {
+															color: '#eee',
+															fontSize: 16,
+															padding: [2, 4],
+														}
+													}
+												}
+											},
+											labelLine: {
+												normal: {
+													length: 30
+												}
+											},
+											data: that.scaleData
+										},
+										{
+											type: 'pie',
+											radius: ['57%', '57.5%'],
+											center: ['50%', '50%'],
+											itemStyle: {
+												normal: {
+													color: 'rgba(248,249,250,0.5)'
+												},
+											},
+											label: {
+												normal: {
+													show: false,
+												}
+											},
+
+											data: [{
+												value: 100,
+												name: ''
+											}]
+										},
+										{
+											type: 'pie',
+											radius: ['59%', '60%'],
+											center: ['50%', '50%'],
+											itemStyle: {
+												normal: {
+													color: 'rgb(248,249,250)'
+												},
+											},
+											label: {
+												normal: {
+													show: false,
+												}
+											},
+											data: [{
+												value: 100,
+												name: ''
+											}]
+										}
+									],
+								});
+							}
+						}, function(response) {
+							console.log('请求错误！')
+						})
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>
