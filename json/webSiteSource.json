@@ -1,0 +1,30 @@
+{
+	"code": 100,
+	"data": [
+		{
+			"max": 15869,
+			"siteName": "阿土伯",
+			"dataCount": 3304
+		}, {
+			"max": 15869,
+			"siteName": "赶集网",
+			"dataCount": 3552
+		}, {
+			"max": 15869,
+			"siteName": "百度地图",
+			"dataCount": 3593
+		}, {
+			"max": 15869,
+			"siteName": "阿里巴巴",
+			"dataCount": 4738
+		}, {
+			"max": 15869,
+			"siteName": "天眼查",
+			"dataCount": 14631
+		}, {
+			"max": 15869,
+			"siteName": "百度知道",
+			"dataCount": 15869
+		}
+	]
+}

@@ -1,0 +1,38 @@
+{
+	"code": 100,
+	"data": [
+		{
+			"companyCount": 7617,
+			"areaName": "东关南街街道",
+			"dataCount": 14470
+		}, {
+			"companyCount": 3790,
+			"areaName": "长乐坊街道",
+			"dataCount": 6317
+		}, {
+			"companyCount": 9497,
+			"areaName": "柏树林街道",
+			"dataCount": 17249
+		}, {
+			"companyCount": 12049,
+			"areaName": "张家村街道",
+			"dataCount": 26746
+		}, {
+			"companyCount": 10837,
+			"areaName": "太乙路街道",
+			"dataCount": 20047
+		}, {
+			"companyCount": 5299,
+			"areaName": "南院门街道",
+			"dataCount": 8263
+		}, {
+			"companyCount": 19660,
+			"areaName": "文艺路街道",
+			"dataCount": 31721
+		}, {
+			"companyCount": 15175,
+			"areaName": "长安路街道",
+			"dataCount": 28116
+		}
+	]
+}

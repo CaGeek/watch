@@ -4,7 +4,8 @@
 		<meta charset="utf-8">
 		<link rel="stylesheet" type="text/css" href="css/watch.css" />
 	</head>
-	<!--<script src="http://lab.mkblog.cn/high/happy.js"></script>-->
+	<!--嘿嘿嘿-->
+	<script src="http://lab.mkblog.cn/high/happy.js"></script> 
 	<body>
 		<!--上层Json地图-->
 		<div id="main"></div>
@@ -14,7 +15,7 @@
 		<div id="content" v-cloak>
 			<!--标题-->
 			<div id="title">
-				<strong>碑林地税互联网监控平台</strong>
+				<strong>互联网监控平台</strong>
 			</div>
 			<!--时钟-->
 			<div class="timeDate">
@@ -26,7 +27,7 @@
 			<!--互联网数据数据实时监控-->
 			<div class="countData">
 				<span>互联网数据</span>
-				<span class="date">{{countData}}</span>
+				<span class="date">111111111</span>
 			</div>
 			<!--实时数据-->
 			<strong class="realDataTitle">实时数据</strong>
@@ -117,7 +118,7 @@
 							zlevel: 1
 						})
 					/*互联网数据条数*/
-					this.getCount()
+//					this.getCount()
 					/*背景迁徙图*/
 					this.getBackImage()
 					/*顶部时间*/
@@ -139,15 +140,15 @@
 				},
 				methods: {
 					/*互联网数据*/
-					getCount: function() {
+					/*getCount: function() {
 						that.getAjaxCount()
 						clearInterval(timer)
 						var timer = setInterval(function() {
 							that.getAjaxCount()
 						}, 1000)
-					},
+					},*/
 					/*互联网数据Ajax请求*/
-					getAjaxCount: function() {
+					/*getAjaxCount: function() {
 						that.$http.get(mapUrl + '/watch/getDataCount').then(function(response) {
 							if(response.data.code == 100) {
 								that.countData = response.data.dataCount
@@ -155,7 +156,7 @@
 						}, function(response) {
 							console.log('请求错误！')
 						})
-					},
+					},*/
 					/*背景迁徙图*/
 					getBackImage: function() {
 						that.getMapdata()
@@ -167,7 +168,7 @@
 					},
 					/*迁徙图ajax数据请求*/
 					getMapdata: function() {
-						that.$http.get(mapUrl + '/watch/getCurrentChartData?lastTime=' + that.time).then(function(response) {
+						that.$http.get('json/map.json').then(function(response) {
 							if(response.data.code == 100) {
 								that.time = response.data.lastTime
 								for(var i = 0; i < Inter.length; i++) {
@@ -364,7 +365,7 @@
 					},
 					/*实时数据ajax*/
 					getAjaxCurrent: function() {
-						that.$http.get(mapUrl + '/watch/getCurrentData?lastTime=' + that.lastTime).then(function(response) {
+						that.$http.get('json/realData.json').then(function(response) {
 							if(response.data.code == 100) {
 								that.lastTime = response.data.lastTime
 								for(var i = 0; i < Inter2.length; i++) {
@@ -409,7 +410,7 @@
 					/*辖区企业及数据Ajax请求*/
 					getAjaxComAndData: function() {
 						var myBar = echarts.init(document.getElementById('companyData'));
-						that.$http.get(mapUrl + '/watch/getComsAndData').then(function(response) {
+						that.$http.get('json/comAnddata.json').then(function(response) {
 							for(var i = 0; i < response.data.data.length; i++) {
 								that.companyCount[i] = response.data.data[i].companyCount
 								that.areaName[i] = response.data.data[i].areaName.substring(0,response.data.data[i].areaName.length - 2)
@@ -520,7 +521,7 @@
 					/*数据来源Ajax请求*/
 					getAjaxSource: function() {
 						var myBarSource = echarts.init(document.getElementById('companySource'));
-						that.$http.get(mapUrl + '/watch/getHotWebSite').then(function(response) {
+						that.$http.get('json/webSiteSource.json').then(function(response) {
 							if(response.data.code == 100) {
 								for(var i = 0; i < response.data.data.length; i++) {
 									that.sourceData[i] = response.data.data[i].dataCount
@@ -675,7 +676,7 @@
 					/*辖区数据占比Ajax*/
 					getAjaxScale: function() {
 						var myPie = echarts.init(document.getElementById('scaleData'));
-						that.$http.get(mapUrl + '/watch/getComsAndData').then(function(response) {
+						that.$http.get('json/comAnddata.json').then(function(response) {
 							if(response.data.code == 100) {
 								that.scaleData = []
 								for(var i = 0; i < response.data.data.length; i++) {
